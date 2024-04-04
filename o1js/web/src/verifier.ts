@@ -22,6 +22,8 @@ export async function verify(json) {
   const privKey = PrivateKey.fromBase58(
     'EKFSmntAEAPm5CnYMsVpfSEuyNfbXfxy2vHW8HPxGyPPgm5xyRtN'
   );
+  pubKey.assertEquals(privKey.toPublicKey());
+
   const o1jsSignature = Signature.create(privKey, dataFields);
   const isValidO1js = o1jsSignature.verify(pubKey, dataFields);
   console.log('o1js signature is valid:', isValidO1js.toBoolean());
