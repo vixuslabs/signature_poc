@@ -11,7 +11,7 @@ export async function verify(json) {
   const pubKey = PublicKey.fromBase58(parsedJson.public_key);
 
   const dataFields: Field[] = [];
-  parsedJson.data.forEach((byte: number) => dataFields.push(Field(byte)));
+  parsedJson.data[0].forEach((byte: number) => dataFields.push(Field(byte)));
 
   // Rust generated signature validation
   const rustSignature = Signature.fromBase58(parsedJson.signature);

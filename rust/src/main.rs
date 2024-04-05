@@ -11,17 +11,24 @@ use std::io::Write;
 
 /// Data Struct
 #[derive(Clone)]
-pub struct Data(Vec<u8>);
+pub struct Data {
+    pub fields: Vec<BaseField>,
+}
 
 impl Hashable for Data {
     type D = NetworkId;
 
     fn to_roinput(&self) -> ROInput {
-        ROInput::new().append_bytes(&self.0)
+        self.fields
+            .iter()
+            .fold(ROInput::new(), |roi, field| roi.append_field(*field))
     }
 
-    fn domain_string(_: Self::D) -> Option<String> {
-        None
+    fn domain_string(network_id: NetworkId) -> Option<String> {
+        match network_id {
+            NetworkId::MAINNET => "MinaSignatureMainnet".to_string().into(),
+            NetworkId::TESTNET => "CodaSignature".to_string().into(),
+        }
     }
 }
 
@@ -52,8 +59,10 @@ fn main() {
         SecKey::from_base58("EKFSmntAEAPm5CnYMsVpfSEuyNfbXfxy2vHW8HPxGyPPgm5xyRtN").unwrap();
     let keypair = Keypair::from_secret_key(priv_key.clone()).unwrap();
 
-    let data = Data(vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    let mut ctx = mina_signer::create_legacy::<Data>(NetworkId::TESTNET);
+    let data = Data {
+        fields: vec![BaseField::from(1u64), BaseField::from(2u64)],
+    };
+    let mut ctx = mina_signer::create_kimchi::<Data>(NetworkId::TESTNET);
     let signature = Signature::Mina(ctx.sign(&keypair, &data));
     let sig_bytes = [vec![154], vec![1], signature.to_bytes().to_vec()].concat();
     let b58_str = bitcoin::base58::encode_check(&sig_bytes);
@@ -63,7 +72,7 @@ fn main() {
         Signature::Mina(sig) => {
             println!("rx: {:?}\ns: {:?}", sig.rx.to_biguint(), sig.s.to_biguint());
             json_data = json!({
-                "data": data.0,
+                "data": data.fields.iter().map(|f| f.to_biguint()).collect::<Vec<_>>(),
                 "signature": b58_str,
                 "public_key": PubKey::from_secret_key(priv_key).unwrap().into_address(),
             });
