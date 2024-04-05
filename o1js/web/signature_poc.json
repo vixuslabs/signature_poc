@@ -1,12 +1,8 @@
 {
   "data": [
-    [
-      1
-    ],
-    [
-      2
-    ]
+    42,
+    69
   ],
   "public_key": "B62qowWuY2PsBZsm64j4Uu2AB3y4L6BbHSvtJcSLcsVRXdiuycbi8Ws",
-  "signature": "7mXTP8Uj7izU7SEZEoePv8ULzdDSNb2Cp41SLCeK4o9VCsF5s7rWQhqyWfQKxY15jrSTy5ZYata1Jnif6f1gPa4mimeK3Bo3"
+  "signature": "7mXErYHYXEB2zjxvCH8f3Xz4xpgab6z8oG5455rsbywaSMXBQ9pZM2EFqtvqJNcfGYbAGkMPhkSJJNpZ1J6BL3KFjXKGdzYb"
 }

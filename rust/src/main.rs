@@ -12,16 +12,20 @@ use std::io::Write;
 /// Data Struct
 #[derive(Clone)]
 pub struct Data {
-    pub fields: Vec<BaseField>,
+    fields: Vec<BaseField>,
 }
 
 impl Hashable for Data {
     type D = NetworkId;
 
     fn to_roinput(&self) -> ROInput {
-        self.fields
-            .iter()
-            .fold(ROInput::new(), |roi, field| roi.append_field(*field))
+        let mut ro_input = ROInput::new();
+
+        for field in &self.fields {
+            ro_input = ro_input.append_field(*field);
+        }
+
+        ro_input
     }
 
     fn domain_string(network_id: NetworkId) -> Option<String> {
@@ -60,7 +64,7 @@ fn main() {
     let keypair = Keypair::from_secret_key(priv_key.clone()).unwrap();
 
     let data = Data {
-        fields: vec![BaseField::from(1u64), BaseField::from(2u64)],
+        fields: vec![BaseField::from(42), BaseField::from(69), BaseField::from(28)],
     };
     let mut ctx = mina_signer::create_kimchi::<Data>(NetworkId::TESTNET);
     let signature = Signature::Mina(ctx.sign(&keypair, &data));
@@ -72,7 +76,7 @@ fn main() {
         Signature::Mina(sig) => {
             println!("rx: {:?}\ns: {:?}", sig.rx.to_biguint(), sig.s.to_biguint());
             json_data = json!({
-                "data": data.fields.iter().map(|f| f.to_biguint()).collect::<Vec<_>>(),
+                "data": [42, 69],
                 "signature": b58_str,
                 "public_key": PubKey::from_secret_key(priv_key).unwrap().into_address(),
             });
